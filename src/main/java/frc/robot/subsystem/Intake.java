@@ -4,6 +4,7 @@
 
 package frc.robot.subsystem;
 
+import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -28,8 +29,8 @@ public class Intake extends SubsystemBase {
   //Enum to determin state, values are temporary
   public enum State{
     IDLE(0.0),
-    INTAKE(1.0),
-    OUTTAKE(-1.0);
+    INTAKE(-1),
+    OUTTAKE(1.0);
 
     public double roller_voltage;
     State(double roller_voltage){
@@ -38,8 +39,8 @@ public class Intake extends SubsystemBase {
   }
   //Enum to determin pivot position, values are temporary
   public enum Pivot{
-    STOW(0.0),
-    DEPLOY(5.62793);
+    STOW(-.3),
+    DEPLOY(5.558594);
 
     public double position;
 
@@ -50,12 +51,12 @@ public class Intake extends SubsystemBase {
   
 
   //Motors
-  private final TalonFX m_IntakePivot = new TalonFX(BotConstants.Intake.pivotID);
-  private final TalonFX m_IntakeRoller = new TalonFX(BotConstants.Intake.intakeID);
+  private final TalonFX m_IntakePivot = new TalonFX(BotConstants.Intake.pivotID, new CANBus("cv"));
+  private final TalonFX m_IntakeRoller = new TalonFX(BotConstants.Intake.intakeID, new CANBus("cv"));
   //Motor Controller
   private final MotionMagicVoltage PivotPositionControl = new MotionMagicVoltage(0);
   //Variables getting the values
-  private State mState = State.IDLE;
+  private State mState = State.INTAKE;
   private Pivot mPivot = Pivot.STOW;
 
   //Constructor, just sets up the config
@@ -65,17 +66,18 @@ public class Intake extends SubsystemBase {
   }
 
   //Set roller and pivot state together
-  public Command intake_Command(){
-    return run(()->{
-    m_IntakePivot.setControl(PivotPositionControl.withPosition(mPivot.position)); 
-    m_IntakeRoller.setVoltage(mState.roller_voltage);});
-  }
+ public Command intake_Command(){
+    return run(() -> {
+        m_IntakePivot.setControl(PivotPositionControl.withPosition(Pivot.DEPLOY.position));
+        m_IntakeRoller.setVoltage(State.INTAKE.roller_voltage);
+    });
+}
 
   //Stows, basically sets everything to 0
   public Command stow(){
     return run(()->{
-      m_IntakePivot.setControl(PivotPositionControl.withPosition(0));
-      m_IntakeRoller.setVoltage(0);
+        m_IntakePivot.setControl(PivotPositionControl.withPosition(Pivot.STOW.position));
+        m_IntakeRoller.setVoltage(State.INTAKE.roller_voltage);
     });
   }
 

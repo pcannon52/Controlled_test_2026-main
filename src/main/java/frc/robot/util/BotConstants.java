@@ -41,9 +41,10 @@ public class BotConstants {
             cfg_Roller.CurrentLimits.StatorCurrentLimit = 120.;
         }
         static{
-            cfg_Pivot.Slot0.kP = 0.0;
+            cfg_Pivot.Slot0.kP = 3.0;
             cfg_Pivot.Slot0.kI = 0.0;
             cfg_Pivot.Slot0.kP = 0.0;
+            cfg_Pivot.Feedback.SensorToMechanismRatio = 15.0;
             cfg_Pivot.MotorOutput.NeutralMode = NeutralModeValue.Brake;
         }
     }
