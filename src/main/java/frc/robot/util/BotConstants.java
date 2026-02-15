@@ -71,9 +71,9 @@ public class BotConstants {
         static{
             cfg_shooter_Input.Slot0.kP = 0.0;
             cfg_shooter_Output.Slot0.kP = 0.0;
-        }
+        
 
-        static{
+         // make sure for key to input the actual angle of the shooter and not the angle of motor
             velocityTable.put(0.0, 0.0);
             velocityTable.put(1.0, 1.0);
             velocityTable.put(1.0, 1.0);
@@ -91,9 +91,9 @@ public class BotConstants {
         public static final InterpolatingDoubleTreeMap shooterTable = new InterpolatingDoubleTreeMap();
         static{
             cfg_Hood.Slot0.kP = 0.0;
-        }
+        
 
-        static{
+         // for value make sure to put in the actualle value of the shooter and not the angle of motor
             shooterTable.put(0.0,0.0);
             shooterTable.put(1.0,1.0);
             shooterTable.put(1.0,1.0);

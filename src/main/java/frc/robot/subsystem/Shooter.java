@@ -9,11 +9,9 @@ import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.TunerConstants;
 import frc.robot.util.BotConstants;
 
 public class Shooter extends SubsystemBase {
@@ -30,7 +28,7 @@ public class Shooter extends SubsystemBase {
 
   public static enum State{
     IDLE(0,0),
-    OUTPUT(10, BotConstants.Shooter.velocityTable.get(1.0)); // the 1 will be replaced with hood angle
+    OUTPUT(10, BotConstants.Shooter.velocityTable.get(Hood.get().getHoodAngleDegrees())); // the 1 will be replaced with hood angle
 
     double inputSpeed;
     double outputSpeed;

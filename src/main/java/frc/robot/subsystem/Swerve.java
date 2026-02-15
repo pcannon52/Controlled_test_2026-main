@@ -101,13 +101,15 @@ public final class Swerve extends TunerSwerveDrivetrain implements Subsystem, Se
 		)).minus(Swerve.get().getPose().getRotation());
 	}
 
-	
-
 	public Pose2d getPose(){
 		return this.getState().Pose;
 	}
 
-	
+	public double distanceToHub(){
+		return Field.Alliance_Find.hub.getDistance(new Translation2d(
+		Swerve.get().getPose().getX(), Swerve.get().getPose().getY())	
+		);
+	}
 
 	double m_lastSimTime;
 	Notifier simUpdate;
