@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
@@ -32,20 +33,23 @@ public class BotConstants {
         public static TalonFXConfiguration cfg_Roller = new TalonFXConfiguration();
         public static TalonFXConfiguration cfg_Pivot = new TalonFXConfiguration();
         static{
-            cfg_Roller.Slot0.kP = 0.0;
-            cfg_Roller.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-            cfg_Roller.MotionMagic.MotionMagicAcceleration = 40;
-            cfg_Roller.MotionMagic.MotionMagicCruiseVelocity = 20;
+            cfg_Roller.Slot0.kP = .45;
+            cfg_Roller.Slot0.kV = .1;
+            cfg_Roller.Slot0.kS = .1;
+            cfg_Roller.MotorOutput.Inverted = InvertedValue.Clockwise_Positive;
+            cfg_Roller.MotorOutput.NeutralMode = NeutralModeValue.Coast;
+            cfg_Roller.MotionMagic.MotionMagicAcceleration = 3000.0 / 60.0;
+            cfg_Roller.MotionMagic.MotionMagicCruiseVelocity = 6000.0 / 60.0;
             cfg_Roller.CurrentLimits.StatorCurrentLimitEnable = false;
-            cfg_Roller.CurrentLimits.SupplyCurrentLimitEnable = false;
-            cfg_Roller.CurrentLimits.StatorCurrentLimit = 120.;
-        }
-        static{
-            cfg_Pivot.Slot0.kP = 3.0;
-            cfg_Pivot.Slot0.kI = 0.0;
-            cfg_Pivot.Slot0.kP = 0.0;
-            cfg_Pivot.Feedback.SensorToMechanismRatio = 15.0;
+            cfg_Roller.CurrentLimits.SupplyCurrentLimitEnable = true;
+            cfg_Roller.CurrentLimits.StatorCurrentLimit = 30.;
+    
+            cfg_Pivot.Slot0.kP = -7.;
+            cfg_Pivot.Slot0.kD = 0.0;
+
             cfg_Pivot.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+            cfg_Pivot.CurrentLimits.StatorCurrentLimitEnable = true;
+            cfg_Pivot.CurrentLimits.StatorCurrentLimit = 60.;
         }
     }
 
@@ -59,14 +63,14 @@ public class BotConstants {
     }
 
     public static class Shooter{
-        public static final int shooterflywheel_ID = 0;
-        public static final int shooterIntake_ID = 0;
-        public static final TalonFXConfiguration cfg_shooter = new TalonFXConfiguration();
-        public static final TalonFXConfiguration cfg_shooter_intake = new TalonFXConfiguration();
+        public static final int shooterInputID = 0;
+        public static final int shooterOutputID = 0;
+        public static final TalonFXConfiguration cfg_shooter_Input = new TalonFXConfiguration();
+        public static final TalonFXConfiguration cfg_shooter_Output = new TalonFXConfiguration();
         public static final InterpolatingDoubleTreeMap velocityTable = new InterpolatingDoubleTreeMap();
         static{
-            cfg_shooter.Slot0.kP = 0.0;
-            cfg_shooter_intake.Slot0.kP = 0.0;
+            cfg_shooter_Input.Slot0.kP = 0.0;
+            cfg_shooter_Output.Slot0.kP = 0.0;
         }
 
         static{

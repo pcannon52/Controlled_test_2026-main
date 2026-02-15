@@ -1,15 +1,23 @@
+
 // Copyright (c) FIRST and other WPILib contributors.
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystem;
 
-import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.controls.MotionMagicVelocityVoltage;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
+import com.ctre.phoenix6.controls.PositionVoltage;
+import com.ctre.phoenix6.controls.VelocityDutyCycle;
+import com.ctre.phoenix6.controls.VelocityVoltage;
+import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import static edu.wpi.first.wpilibj2.command.Commands.*;
 import frc.robot.util.BotConstants;
 
 public class Intake extends SubsystemBase {
@@ -27,20 +35,20 @@ public class Intake extends SubsystemBase {
   /** Creates a new Intake. */
 
   //Enum to determin state, values are temporary
-  public enum State{
+  public static enum State{
     IDLE(0.0),
-    INTAKE(-1),
-    OUTTAKE(1.0);
+    INTAKE(3000.0),
+    OUTTAKE(-3000.0);
 
-    public double roller_voltage;
-    State(double roller_voltage){
-      this.roller_voltage = roller_voltage;
+    public double roller_velocity;  // Renamed
+    State(double roller_velocity){
+        this.roller_velocity = roller_velocity;
     }
-  }
+}
   //Enum to determin pivot position, values are temporary
   public enum Pivot{
-    STOW(-.3),
-    DEPLOY(5.558594);
+    STOW(0.00),
+    DEPLOY(5.62793);
 
     public double position;
 
@@ -51,40 +59,46 @@ public class Intake extends SubsystemBase {
   
 
   //Motors
-  private final TalonFX m_IntakePivot = new TalonFX(BotConstants.Intake.pivotID, new CANBus("cv"));
-  private final TalonFX m_IntakeRoller = new TalonFX(BotConstants.Intake.intakeID, new CANBus("cv"));
+  private final TalonFX m_IntakePivot = new TalonFX(BotConstants.Intake.pivotID, BotConstants.Canivore);
+  private final TalonFX m_IntakeRoller = new TalonFX(BotConstants.Intake.intakeID, BotConstants.Canivore);
   //Motor Controller
-  private final MotionMagicVoltage PivotPositionControl = new MotionMagicVoltage(0);
-  //Variables getting the values
-  private State mState = State.INTAKE;
-  private Pivot mPivot = Pivot.STOW;
+  private final PositionVoltage PivotPositionControl = new PositionVoltage(0);
+  private final MotionMagicVelocityVoltage intakeVelocityController  = new MotionMagicVelocityVoltage(0);
 
-  //Constructor, just sets up the config
   public Intake() {
     m_IntakeRoller.getConfigurator().apply(BotConstants.Intake.cfg_Roller);
     m_IntakePivot.getConfigurator().apply(BotConstants.Intake.cfg_Pivot);
+    m_IntakePivot.setPosition(0.0); // the Intake must start up
+
+    this.setDefaultCommand(doStow());
   }
 
-  //Set roller and pivot state together
- public Command intake_Command(){
-    return run(() -> {
-        m_IntakePivot.setControl(PivotPositionControl.withPosition(Pivot.DEPLOY.position));
-        m_IntakeRoller.setVoltage(State.INTAKE.roller_voltage);
+  public void runIntake(State state) {
+    m_IntakeRoller.setControl(intakeVelocityController.withVelocity(state.roller_velocity/60));
+  }
+
+    public void positionIntake(double state) {
+    m_IntakePivot.setControl(PivotPositionControl.withPosition(state)); //
+    //vout.withOutput(-1 * pidController.calculate(m_IntakePivot.getPosition().getValueAsDouble(), state))
+  }
+
+  public Command doIntake() {
+    return this.run(() -> {
+        this.runIntake(State.INTAKE); this.positionIntake(5.7);
     });
+  }
+
+public Command doStow() {
+    return this.run(() -> {
+        m_IntakeRoller.stopMotor(); this.positionIntake(0.);
+    });
+  }
+
+@Override
+public void periodic() {
+
+
+    SmartDashboard.putNumber("Pivot Position", m_IntakePivot.getPosition().getValueAsDouble());
+    SmartDashboard.putData(this);
 }
-
-  //Stows, basically sets everything to 0
-  public Command stow(){
-    return run(()->{
-        m_IntakePivot.setControl(PivotPositionControl.withPosition(Pivot.STOW.position));
-        m_IntakeRoller.setVoltage(State.INTAKE.roller_voltage);
-    });
-  }
-
-
-  @Override
-  //Sets the values
-  public void periodic() {
-    
-  }
 }
